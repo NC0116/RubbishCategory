@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ischoolbar.programmer.dao.admin.RubbishCategoryDao">
+	<!-- 根据垃圾分类名查找垃圾分类 -->
+	<select id="findByName" parameterType="String" resultType="RubbishCategory">
+		select * from rubbish_category where name = #{name}
+	</select>
+	<!-- 根据常见垃圾分类名查找垃圾分类 -->
+	<select id="findByCommon" parameterType="String" resultType="RubbishCategory">
+		select * from rubbish_category where common like '%${value}%'
+	</select>
+	<!-- 添加垃圾分类 -->
+	<insert id="add" parameterType="RubbishCategory">
+		insert into rubbish_category(id,`name`,`explain`,`require`,`common`) values(null,#{name},#{explain},#{require},#{common})
+	</insert>
+	<!-- 修改垃圾分类 -->
+	<update id="edit" parameterType="RubbishCategory">
+		update rubbish_category set `name` = #{name},`explain` = #{explain},`require` = #{require},`common` = #{common} where id = #{id}
+	</update>
+	<!-- 删除垃圾分类 -->
+	<delete id="delete" parameterType="Long">
+		delete from rubbish_category where id = ${value}
+	</delete>
+	<!-- 分页获取垃圾分类列表 -->
+	<select id="findList" parameterType="Map" resultType="RubbishCategory">
+		select * from rubbish_category where 1 = 1 
+		<if test="name != null">
+			and `name` like '%${name}%' 
+		</if>
+		<if test="offset != null and pageSize != null">
+			limit #{offset},#{pageSize}
+		</if>
+	</select>
+	<!-- 获取符合结果的总记录数 -->
+	<select id="getTotal" parameterType="Map" resultType="Integer">
+		select count(*) from rubbish_category where 1 = 1 
+		<if test="name != null">
+			and `name` like '%${name}%' 
+		</if>
+	</select>
+</mapper>

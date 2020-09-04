@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ischoolbar.programmer.dao.admin.RubbishDao">
+	<resultMap id="rubbishMap" type="com.ischoolbar.programmer.entity.admin.Rubbish">
+		<id column="r_id" jdbcType="BIGINT" property="id" />
+  		<result column="r_name" jdbcType="VARCHAR" property="name"/>
+  		<result column="r_categoryId" jdbcType="BIGINT" property="categoryId"/>
+  		<association property="rubbishCategory" javaType="com.ischoolbar.programmer.entity.admin.RubbishCategory">
+		    <id column="rc_id" jdbcType="BIGINT" property="id"/>
+		    <result  column="rc_name" jdbcType="VARCHAR" property="name"/>
+		    <result  column="rc_explain" jdbcType="VARCHAR" property="explain"/>
+		    <result  column="rc_require" jdbcType="VARCHAR" property="require"/>
+		    <result  column="rc_common" jdbcType="VARCHAR" property="common"/>
+		</association>
+	</resultMap>
+	
+	
+	<!-- 根据垃圾名查找垃圾 -->
+	<select id="findByName" parameterType="String" resultMap="rubbishMap">
+		select 
+			r.id as r_id,r.name as r_name,r.categoryId as r_categoryId,
+			rc.id as rc_id,rc.name as rc_name,rc.explain as rc_explain,rc.require as rc_require,rc.common as rc_common 
+			from rubbish r,rubbish_category rc where r.categoryId = rc.id and r.name like '%${value}%'
+	</select>
+	<!-- 添加垃圾 -->
+	<insert id="add" parameterType="Rubbish">
+		insert into rubbish(id,`name`,categoryId) values(null,#{name},#{categoryId})
+	</insert>
+	<!-- 修改垃圾 -->
+	<update id="edit" parameterType="Rubbish">
+		update rubbish set `name` = #{name},`categoryId` = #{categoryId} where id = #{id}
+	</update>
+	<!-- 删除垃圾 -->
+	<delete id="delete" parameterType="Long">
+		delete from rubbish where id = ${value}
+	</delete>
+	<!-- 分页获取垃圾列表 -->
+	<select id="findList" parameterType="Map" resultMap="rubbishMap">
+		select 
+			r.id as r_id,r.name as r_name,r.categoryId as r_categoryId,
+			rc.id as rc_id,rc.name as rc_name,rc.explain as rc_explain,rc.require as rc_require,rc.common as rc_common 
+			from rubbish r,rubbish_category rc where r.categoryId = rc.id 
+		<if test="name != null">
+			and r.`name` like '%${name}%' 
+		</if>
+		<if test="categoryId != null">
+			and r.`categoryId` = #{categoryId}  
+		</if>
+		<if test="offset != null and pageSize != null">
+			limit #{offset},#{pageSize}
+		</if>
+	</select>
+	<!-- 获取符合结果的总记录数 -->
+	<select id="getTotal" parameterType="Map" resultType="Integer">
+		select count(*) from rubbish where 1 = 1 
+		<if test="name != null">
+			and `name` like '%${name}%' 
+		</if>
+		<if test="categoryId != null">
+			and `categoryId` = #{categoryId}  
+		</if>
+	</select>
+</mapper>
